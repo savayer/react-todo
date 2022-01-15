@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+	display: flex;
+	height: 100vh;
+	background-color: rgb(248 250 252);
+}
+
+#root {
+	margin: auto;
+	width: 800px;
+	max-width: 95%;
+}
+
+.app {
+	margin: 20px 0;
+	overflow-y: auto;
+	max-height: 95vh;
+}
