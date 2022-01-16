@@ -16,6 +16,5 @@ body {
 
 .app {
 	margin: 20px 0;
-	overflow-y: auto;
 	max-height: 95vh;
 }

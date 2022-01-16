@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types'
 import cx from 'classnames';
 
-function TodoItem({ title, text, onChecked, todoItemId }) {
+function TodoItem({ title, text, completed, todoItemId, onChecked }) {
 	const [isChecked, setChecked] = useState(false)
 	const todoItemClickHandler = (todoItemData) => {
 		setChecked(!isChecked);
@@ -10,6 +10,7 @@ function TodoItem({ title, text, onChecked, todoItemId }) {
 	}
 
 	const classNames = cx('todo-item mb-2 p-2 cursor-pointer', {
+		'bg-orange-50': completed,
 		'bg-slate-100': isChecked,
 		'hover:bg-slate-50': !isChecked
 	})
@@ -34,7 +35,8 @@ TodoItem.propTypes = {
 	title: PropTypes.string.isRequired,
 	todoItemId: PropTypes.number.isRequired,
 	onChecked: PropTypes.func.isRequired,
-	text: PropTypes.string
+	text: PropTypes.string,
+	completed: PropTypes.bool
 }
 
 export default TodoItem;
