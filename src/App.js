@@ -1,18 +1,33 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import TodoList from "./components/TodoList";
 import CreateTodo from "./components/CreateTodo";
 import Context from "./context";
 import TodoItemsActions from "./components/TodoItemsActions";
 import UpdateTodo from "./components/UpdateTodo";
+import * as request from "./api/rest/todos";
+import Loader from "./components/UI/Loader";
 
 function App() {
+	const [isLoading, setLoading] = useState(false)
 	const [isShowModal, setShowModal] = useState(false)
 	const [todoItemForEditing, setTodoItemForEditing] = useState({})
-	const [todos, setTodos] = useState([
-		{ id: 1, completed: false, name: 'Buy a bread', description: 'Sliced for toast in Titan :)' },
-		{ id: 2, completed: false, name: 'Wash the dishes' },
-		{ id: 3, completed: false, name: 'Feed the cat', description: 'Sheba or Kitekat' }
-	])
+	const [todos, setTodos] = useState([])
+
+	useEffect(async () => {
+		await fetchTodos()
+	}, [])
+
+	async function fetchTodos () {
+		try {
+			setLoading(true)
+			const { data } = await request.getTodos()
+			setTodos(data)
+		} catch (e) {
+			console.error(e)
+		} finally {
+			setLoading(false)
+		}
+	}
 
 	/**
 	 * @param todoData - object
@@ -33,8 +48,18 @@ function App() {
 		return todos.filter(todo => todo.isChecked)
 	}
 
-	function deleteTodoItem () {
-		setTodos(todos.filter(todo => !todo.isChecked))
+	async function deleteTodoItem () {
+		try {
+			const filteredTodos = todos.filter(todo => !todo.isChecked)
+			const todosIds = filteredTodos.map(todo => todo.id).flat()
+			setLoading(true)
+			await request.deleteTodos({ todosIds })
+			setTodos(filteredTodos)
+		} catch (e) {
+			console.error(e)
+		} finally {
+			setLoading(false)
+		}
 	}
 
 	function completeTodoItem () {
@@ -47,21 +72,38 @@ function App() {
 		}))
 	}
 
-	function addTodo (newTodoItem) {
-		setTodos(todos.concat([
-			newTodoItem
-		]))
+	async function addTodo (newTodoItem) {
+		try {
+			setLoading(true)
+			const { data } = await request.createTodo(newTodoItem)
+			setTodos(todos.concat([
+				data
+			]))
+		} catch (e) {
+			console.error(e)
+		} finally {
+			setLoading(false)
+		}
 	}
 
-	function updateTodo (todoItem) {
-		setTodos(todos.map(todo => {
-			if (todo.id === todoItem.id) {
-				todo = todoItem
-			}
-			todo.isChecked = false
+	async function updateTodo (todoItem) {
+		try {
+			setLoading(true)
+			const { data } = await request.updateTodo(todoItem.id, todoItem)
 
-			return todo
-		}))
+			setTodos(todos.map(todo => {
+				if (todo.id === data.id) {
+					todo = data
+				}
+				todo.isChecked = false
+
+				return todo
+			}))
+		} catch (e) {
+			console.error(e)
+		} finally {
+			setLoading(false)
+		}
 	}
 
 	function showModalForEditing (todoItem) {
@@ -72,13 +114,19 @@ function App() {
 	const selectedTasks = getCheckedTodoItems()
 
 	return (
-		<Context.Provider value={{ deleteTodoItem, completeTodoItem, onEdit: showModalForEditing }}>
+		<Context.Provider value={{ deleteTodoItem, completeTodoItem, onEdit: showModalForEditing, isLoading }}>
 			<div className="app bg-white rounded-lg drop-shadow-xl p-3 relative">
-				{selectedTasks.length ? <TodoItemsActions selectedTasks={selectedTasks} /> : '' }
-				<TodoList
-					todos={todos}
-					onSelectTodo={onSelectTodo}
-				/>
+				{isLoading
+					? <Loader className="text-center" />
+					: <div>
+						{selectedTasks.length ? <TodoItemsActions selectedTasks={selectedTasks} /> : '' }
+						<TodoList
+							todos={todos}
+							onSelectTodo={onSelectTodo}
+						/>
+					</div>
+				}
+
 			</div>
 			<CreateTodo	onSubmit={addTodo} />
 			<UpdateTodo

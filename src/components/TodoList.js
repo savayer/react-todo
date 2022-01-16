@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import TodoItem from "./TodoItem";
+import Context from "../context";
 
 function TodoList({ todos, onSelectTodo }) {
-	const noTodos = !todos.length ? <div className="text-2xl p-3 text-center">No Todos...</div> : '';
+	const { isLoading } = useContext(Context)
+	const noTodos = !todos.length && !isLoading ? <div className="text-2xl p-3 text-center">No Todos...</div> : '';
 
 	return (
 		<>
