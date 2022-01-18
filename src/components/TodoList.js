@@ -13,10 +13,7 @@ function TodoList({ todos, onSelectTodo }) {
 			<div className="todo-list overflow-y-auto max-h-96">
 				{todos.map(todo => {
 					return <TodoItem
-						title={todo.name}
-						text={todo.description}
-						todoItemId={todo.id}
-						completed={todo.completed}
+						todo={todo}
 						key={todo.id}
 						onChecked={onSelectTodo}
 					/>

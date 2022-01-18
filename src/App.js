@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import TodoList from "./components/TodoList";
 import CreateTodo from "./components/CreateTodo";
 import Context from "./context";
@@ -13,11 +13,7 @@ function App() {
 	const [todoItemForEditing, setTodoItemForEditing] = useState({})
 	const [todos, setTodos] = useState([])
 
-	useEffect(async () => {
-		await fetchTodos()
-	}, [])
-
-	async function fetchTodos () {
+	const fetchTodos = useCallback(async () => {
 		try {
 			setLoading(true)
 			const { data } = await request.getTodos()
@@ -27,7 +23,11 @@ function App() {
 		} finally {
 			setLoading(false)
 		}
-	}
+	}, [])
+
+	useEffect(() => {
+		fetchTodos().then(()=>{})
+	}, [fetchTodos])
 
 	/**
 	 * @param todoData - object
