@@ -45,10 +45,6 @@ function App() {
 		if (!isShowModal) {
 			setTheModalData(creatingModalData)
 			setTodoItemForEditing({})
-			setTodos(todos.map(todo => {
-				todo.isChecked = false
-				return todo
-			}))
 		}
 	}, [isShowModal])
 
@@ -137,6 +133,14 @@ function App() {
 		setShowingModal(true)
 	}
 
+	function closeModal () {
+		setTodos(todos.map(todo => {
+			todo.isChecked = false
+			return todo
+		}))
+		setShowingModal(false)
+	}
+
 	return (
 		<Context.Provider value={{ deleteTodoItem, completeTodoItem, onEdit: showModalForEditing, isLoading }}>
 			<div className="app bg-white rounded-lg drop-shadow-xl p-3 relative">
@@ -159,7 +163,7 @@ function App() {
 						formTitle={theModalData.title}
 						submitButtonText={theModalData.button}
 						onSubmit={theModalData.isUpdating ? updateTodo : addTodo}
-						onClose={() => setShowingModal(false)}
+						onClose={closeModal}
 					/>
 				: ''
 			}
