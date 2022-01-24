@@ -5,9 +5,14 @@ import Modal from "./UI/Modal";
 
 function ModalTodoForm ({ formTitle, onClose, onSubmit, submitButtonText, todoItemForEditing }) {
 	const [todoName, setTodoName] = useState(todoItemForEditing.name || '')
+	const [hasTodoNameError, setTodoNameError] = useState(false)
 	const [todoDescription, setTodoDescription] = useState(todoItemForEditing.description || '')
 
 	function submit () {
+		if (!todoName) {
+			setTodoNameError(true)
+			return;
+		}
 		onSubmit({
 			id: todoItemForEditing.id || Date.now(),
 			name: todoName,
@@ -25,10 +30,12 @@ function ModalTodoForm ({ formTitle, onClose, onSubmit, submitButtonText, todoIt
 				<input
 					type="text"
 					value={todoName}
+					placeholder="Todo name"
 					onChange={e => setTodoName(e.target.value)}
-					className="border border-slate-300 w-full h-8 focus:outline-none p-2"
+					className={`border border-slate-300 w-full h-8 focus:outline-none p-2 ${hasTodoNameError ? 'border-red-500' : ''}`}
 				/>
 				<textarea
+					placeholder="Todo description"
 					onChange={e => setTodoDescription(e.target.value)}
 					value={todoDescription}
 					className="border border-slate-300 w-full mt-2 min-h-10 max-h-24 focus:outline-none p-2"

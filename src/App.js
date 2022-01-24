@@ -137,8 +137,6 @@ function App() {
 		setShowingModal(true)
 	}
 
-	const selectedTodos = getCheckedTodoItems()
-
 	return (
 		<Context.Provider value={{ deleteTodoItem, completeTodoItem, onEdit: showModalForEditing, isLoading }}>
 			<div className="app bg-white rounded-lg drop-shadow-xl p-3 relative">
@@ -146,7 +144,7 @@ function App() {
 					? <Loader className="text-center" />
 					: <TodoList
 							todos={todos}
-							selectedTodos={selectedTodos}
+							selectedTodos={getCheckedTodoItems()}
 							onSelectTodo={onSelectTodo}
 						/>
 				}
