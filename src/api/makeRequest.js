@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default ({
+const makeRequest = ({
 	url = '/',
 	method = 'get',
 	params = {},
@@ -15,3 +15,5 @@ export default ({
 		headers
 	})
 }
+
+export default makeRequest;
