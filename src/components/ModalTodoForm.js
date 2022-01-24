@@ -1,19 +1,19 @@
-import React, {useEffect, useState} from "react";
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 import Button from "./UI/Button";
 import Modal from "./UI/Modal";
-import PropTypes from 'prop-types';
 
 function ModalTodoForm ({ formTitle, onClose, onSubmit, submitButtonText, todoItemForEditing }) {
-	const [todoName, setTodoName] = useState(todoItemForEditing.name)
-	const [todoDescription, setTodoDescription] = useState(todoItemForEditing.description)
-
-	useEffect(() => {
-		setTodoName(todoItemForEditing.name)
-		setTodoDescription(todoItemForEditing.description)
-	}, [todoItemForEditing])
+	const [todoName, setTodoName] = useState(todoItemForEditing.name || '')
+	const [todoDescription, setTodoDescription] = useState(todoItemForEditing.description || '')
 
 	function submit () {
-		onSubmit({ todoName, todoDescription })
+		onSubmit({
+			id: todoItemForEditing.id || Date.now(),
+			name: todoName,
+			description: todoDescription,
+			completed: false
+		})
 		setTodoName('')
 		setTodoDescription('')
 	}
@@ -34,7 +34,7 @@ function ModalTodoForm ({ formTitle, onClose, onSubmit, submitButtonText, todoIt
 					className="border border-slate-300 w-full mt-2 min-h-10 max-h-24 focus:outline-none p-2"
 				/>
 
-				<Button className="bg-blue-600 text-white ml-auto rounded-sm" size="md" onClick={submit}>
+				<Button className="bg-blue-600 text-white ml-auto rounded-sm" onClick={submit}>
 					{submitButtonText}
 				</Button>
 			</div>

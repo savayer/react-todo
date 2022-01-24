@@ -1,15 +1,27 @@
 import React, {useState, useEffect, useCallback} from "react";
 import TodoList from "./components/TodoList";
-import CreateTodo from "./components/CreateTodo";
+import CreatingTodoButton from "./components/CreatingTodoButton";
 import Context from "./context";
-import TodoItemsActions from "./components/TodoItemsActions";
-import UpdateTodo from "./components/UpdateTodo";
 import * as request from "./api/rest/todos";
 import Loader from "./components/UI/Loader";
+import ModalTodoForm from "./components/ModalTodoForm";
+
+const creatingModalData = {
+	title: 'Creating todo',
+	button: 'Create Todo',
+	isUpdating: false
+}
+
+const updatingModalData = {
+	title: 'Updating todo',
+	button: 'Update Todo',
+	isUpdating: true
+}
 
 function App() {
+	const [theModalData, setTheModalData] = useState(creatingModalData)
 	const [isLoading, setLoading] = useState(false)
-	const [isShowModal, setShowModal] = useState(false)
+	const [isShowModal, setShowingModal] = useState(false)
 	const [todoItemForEditing, setTodoItemForEditing] = useState({})
 	const [todos, setTodos] = useState([])
 
@@ -28,6 +40,17 @@ function App() {
 	useEffect(() => {
 		fetchTodos().then(()=>{})
 	}, [fetchTodos])
+
+	useEffect(() => {
+		if (!isShowModal) {
+			setTheModalData(creatingModalData)
+			setTodoItemForEditing({})
+			setTodos(todos.map(todo => {
+				todo.isChecked = false
+				return todo
+			}))
+		}
+	}, [isShowModal])
 
 	/**
 	 * @param todoData - object
@@ -65,7 +88,7 @@ function App() {
 	function completeTodoItem () {
 		setTodos(todos.map(todo => {
 			if (todo.isChecked) {
-				todo.completed = true
+				todo.completed = !todo.completed
 				todo.isChecked = false
 			}
 			return todo
@@ -74,6 +97,7 @@ function App() {
 
 	async function addTodo (newTodoItem) {
 		try {
+			setShowingModal(false)
 			setLoading(true)
 			const { data } = await request.createTodo(newTodoItem)
 			setTodos(todos.concat([
@@ -88,6 +112,7 @@ function App() {
 
 	async function updateTodo (todoItem) {
 		try {
+			setShowingModal(false)
 			setLoading(true)
 			const { data } = await request.updateTodo(todoItem.id, todoItem)
 
@@ -108,33 +133,39 @@ function App() {
 
 	function showModalForEditing (todoItem) {
 		setTodoItemForEditing(todoItem)
-		setShowModal(true)
+		setTheModalData(updatingModalData)
+		setShowingModal(true)
 	}
 
-	const selectedTasks = getCheckedTodoItems()
+	const selectedTodos = getCheckedTodoItems()
 
 	return (
 		<Context.Provider value={{ deleteTodoItem, completeTodoItem, onEdit: showModalForEditing, isLoading }}>
 			<div className="app bg-white rounded-lg drop-shadow-xl p-3 relative">
 				{isLoading
 					? <Loader className="text-center" />
-					: <div>
-						{selectedTasks.length ? <TodoItemsActions selectedTasks={selectedTasks} /> : '' }
-						<TodoList
+					: <TodoList
 							todos={todos}
+							selectedTodos={selectedTodos}
 							onSelectTodo={onSelectTodo}
 						/>
-					</div>
 				}
-
 			</div>
-			<CreateTodo	onSubmit={addTodo} />
-			<UpdateTodo
-				onSubmit={updateTodo}
-				showModal={isShowModal}
-				todoData={todoItemForEditing}
-				onCloseModal={() => setShowModal(false)}
-			/>
+
+			<CreatingTodoButton onClick={() => setShowingModal(true)} />
+
+			{isShowModal
+				? <ModalTodoForm
+						isShowModal={isShowModal}
+						todoItemForEditing={todoItemForEditing}
+						formTitle={theModalData.title}
+						submitButtonText={theModalData.button}
+						onSubmit={theModalData.isUpdating ? updateTodo : addTodo}
+						onClose={() => setShowingModal(false)}
+					/>
+				: ''
+			}
+
 		</Context.Provider>
 	);
 }

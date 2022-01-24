@@ -18,13 +18,13 @@ function TodoItemsActions ({ selectedTasks }) {
 			className="bg-orange-500 rounded-sm mr-2"
 			title={completeButtonTitle}
 			onClick={completeTodoItem.bind()}>
-			Complete
+			{selectedTasks[0].completed ? 'Incomplete' : 'Complete'}
 		</Button>
 	}
 
 	return (
 		<div className="p-2 border-b border-slate-100 mb-2 flex">
-			<span>Selected {selectedTasksAmount} tasks</span>
+			<span>Selected {selectedTasksAmount} {selectedTasksAmount > 1 ? 'tasks' : 'task'}</span>
 
 			<div className="ml-auto text-white">
 				{$editButton}
