@@ -2,8 +2,6 @@
 
 [View demo](https://savayer.github.io/react-todo/)
 
-In this project is used axios, but if you want you can change it on fetch or something else [here](https://github.com/savayer/react-todo/blob/master/src/api/makeRequest.js)
-
 Requests are made to a fake server [here](https://github.com/savayer/demo)
 
 ## Available Scripts
