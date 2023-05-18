@@ -1,33 +1,38 @@
-import makeRequest from "../makeRequest";
+import makeRequest from '../makeRequest';
 
-export const getTodos = () => {
-	return makeRequest({
+export const getTodos = async () => {
+	const { data: todos } = await makeRequest({
 		url: '/api/todos',
-		method: 'GET'
-	})
-}
+		method: 'GET',
+	});
+
+	return todos.map((todo) => {
+		todo.id = todo._id;
+
+		return todo;
+	});
+};
 
 export const createTodo = (data) => {
 	return makeRequest({
 		url: '/api/todos',
 		method: 'POST',
-		data
-	})
-}
+		data,
+	});
+};
 
 export const updateTodo = (id, data) => {
 	return makeRequest({
 		url: `/api/todos/${id}`,
 		method: 'PUT',
-		data
-	})
-}
+		data,
+	});
+};
 
 export const deleteTodos = (data) => {
 	return makeRequest({
 		url: '/api/todos/1',
 		method: 'DELETE',
-		data
-	})
-}
-
+		data,
+	});
+};

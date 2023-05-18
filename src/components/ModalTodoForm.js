@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import Button from './UI/Button';
 import Modal from './UI/Modal';
+import { classNames } from '../utils/classNames';
 
 export default function ModalTodoForm({
-	formTitle,
+	formTitle = 'New task',
 	onClose,
 	onSubmit,
-	submitButtonText,
+	submitButtonText = 'Create todo',
 	todoItemForEditing,
 }) {
 	const [todoName, setTodoName] = useState(todoItemForEditing.name || '');
@@ -46,9 +46,10 @@ export default function ModalTodoForm({
 					value={todoName}
 					placeholder="Todo name"
 					onChange={(e) => setTodoName(e.target.value)}
-					className={`border border-slate-300 w-full h-8 focus:outline-none p-2 ${
-						hasTodoNameError ? 'border-red-500' : ''
-					}`}
+					className={classNames(
+						'border border-slate-300 w-full h-8 focus:outline-none p-2',
+						hasTodoNameError && 'border-red-500',
+					)}
 				/>
 
 				<textarea
@@ -68,20 +69,3 @@ export default function ModalTodoForm({
 		</Modal>
 	);
 }
-
-ModalTodoForm.defaultProps = {
-	submitButtonText: 'Create todo',
-	formTitle: 'Creating todo',
-	todoItemForEditing: {
-		name: '',
-		description: '',
-	},
-};
-
-ModalTodoForm.propTypes = {
-	onClose: PropTypes.func.isRequired,
-	onSubmit: PropTypes.func.isRequired,
-	submitButtonText: PropTypes.string,
-	formTitle: PropTypes.string,
-	todoItemForEditing: PropTypes.object,
-};

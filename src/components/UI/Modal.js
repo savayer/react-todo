@@ -1,19 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import Portal from '../Portal';
 
-function Modal ({ children, onClose }) {
+export default function Modal({ onClose, children }) {
 	return (
-		<div className="overlay fixed z-10 inset-0 flex bg-black/75">
-			<div className="modal m-auto w-11/12 sm:w-1/2 xl:w-1/4 p-5 bg-white rounded-md relative">
-				<svg className="absolute top-3 right-3 cursor-pointer w-3 h-3" onClick={() => onClose()}><use xlinkHref="#close" /></svg>
-				{children}
+		<Portal>
+			<div className="fixed z-10 inset-0 flex">
+				<div className="fixed bg-black/50 z-10 inset-0" onClick={onClose} />
+
+				<div className="m-auto w-11/12 sm:w-1/2 xl:w-1/4 p-5 bg-white rounded-md relative z-10">
+					<svg
+						className="absolute top-3 right-3 cursor-pointer w-3 h-3"
+						onClick={onClose}
+					>
+						<use xlinkHref="#close" />
+					</svg>
+
+					{children}
+				</div>
 			</div>
-		</div>
-	)
+		</Portal>
+	);
 }
-
-Modal.propTypes = {
-	onClose: PropTypes.func.isRequired
-}
-
-export default Modal;

@@ -1,41 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import cx from 'classnames';
+import React, { useState } from 'react';
+import { classNames } from '../utils/classNames';
+import { Checkbox } from './UI/Checkbox';
+import Button from './UI/Button';
+import Trash from '../icons/Trash';
+import Editing from '../icons/Editing';
 
-export default function TodoItem({ todo, onChecked }) {
-	const [isChecked, setChecked] = useState(todo.isChecked);
-	const todoItemClickHandler = (todoItemData) => {
+export default function TodoItem({ todo, onEdit, onDelete }) {
+	const [isChecked, setChecked] = useState(todo.completed);
+
+	function onChange() {
 		setChecked(!isChecked);
-		onChecked(todoItemData);
-	};
-
-	useEffect(() => {
-		setChecked(todo.isChecked);
-	}, [todo.isChecked]);
+	}
 
 	return (
 		<div
-			className={cx('todo-item mb-2 p-2 cursor-pointer', {
-				'bg-orange-50': todo.completed,
-				'bg-slate-100': isChecked,
-				'hover:bg-slate-50': !isChecked,
-			})}
-			title="Select the task"
-			onClick={() =>
-				todoItemClickHandler({ todoItemId: todo.id, isChecked: !isChecked })
-			}
-		>
-			<input type="checkbox" className="hidden" value={isChecked} />
-			<div className="todo-item__title font-medium text-xl">{todo.title}</div>
-
-			{todo.description && (
-				<div className="todo-item__text text-slate-400">{todo.description}</div>
+			className={classNames(
+				'group flex items-center p-2',
+				!todo.completed && 'hover:bg-slate-100',
+				todo.completed && '',
 			)}
+		>
+			<Checkbox
+				checked={isChecked}
+				onChange={onChange}
+				labelClass={classNames(
+					'flex items-center',
+					isChecked && 'line-through opacity-50',
+				)}
+			>
+				<div>
+					<div className="text-xl font-medium">{todo.title}</div>
+
+					{todo.description && (
+						<div className="text-slate-400">{todo.description}</div>
+					)}
+				</div>
+			</Checkbox>
+
+			<Button
+				title="Delete task"
+				className="ml-auto mr-1 bg-blue-400 !p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+				onClick={onEdit}
+			>
+				<Editing className="h-4 w-4 fill-white" />
+			</Button>
+
+			<Button
+				title="Delete task"
+				className="bg-red-400 !p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+				onClick={onDelete}
+			>
+				<Trash className="h-4 w-4 fill-white" />
+			</Button>
 		</div>
 	);
 }
-
-TodoItem.propTypes = {
-	todo: PropTypes.object.isRequired,
-	onChecked: PropTypes.func.isRequired,
-};
