@@ -1,14 +1,13 @@
 import React from 'react';
 
-function Button({children, ...rootDOMAttributes }) {
-	const classNames = `hover:opacity-80 px-3 py-1.5 ${rootDOMAttributes.className}`
-	delete rootDOMAttributes.className
-
+export default function Button({ className, children, ...attributes }) {
 	return (
-		<button type="button" className={classNames} {...rootDOMAttributes}>
+		<button
+			type="button"
+			className={`hover:opacity-80 px-3 py-1.5 ${className}`}
+			{...attributes}
+		>
 			{children}
 		</button>
-	)
+	);
 }
-
-export default Button;

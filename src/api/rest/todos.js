@@ -2,14 +2,14 @@ import makeRequest from "../makeRequest";
 
 export const getTodos = () => {
 	return makeRequest({
-		url: 'https://my-json-server.typicode.com/savayer/demo/todos',
+		url: '/api/todos',
 		method: 'GET'
 	})
 }
 
 export const createTodo = (data) => {
 	return makeRequest({
-		url: 'https://my-json-server.typicode.com/savayer/demo/todos',
+		url: '/api/todos',
 		method: 'POST',
 		data
 	})
@@ -17,7 +17,7 @@ export const createTodo = (data) => {
 
 export const updateTodo = (id, data) => {
 	return makeRequest({
-		url: `https://my-json-server.typicode.com/savayer/demo/todos/${id}`,
+		url: `/api/todos/${id}`,
 		method: 'PUT',
 		data
 	})
@@ -25,7 +25,7 @@ export const updateTodo = (id, data) => {
 
 export const deleteTodos = (data) => {
 	return makeRequest({
-		url: 'https://my-json-server.typicode.com/savayer/demo/todos/1',
+		url: '/api/todos/1',
 		method: 'DELETE',
 		data
 	})
