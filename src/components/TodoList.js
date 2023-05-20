@@ -1,9 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TodoItem from './TodoItem';
-import * as request from '../api/rest/todos';
 import AddButton from './AddButton';
 import Loader from './UI/Loader';
 import ModalTodoForm from './ModalTodoForm';
+import { useRequest } from '../hooks/useRequest';
+import {
+	completeTodo,
+	createTodo,
+	deleteTodo,
+	getTodos,
+	updateTodo,
+} from '../api/rest/todos';
 
 const creatingModalData = {
 	title: 'New task',
@@ -19,24 +26,19 @@ const updatingModalData = {
 
 export default function TodoList() {
 	const [theModalData, setTheModalData] = useState(creatingModalData);
-	const [isShowModal, setShowingModal] = useState(false);
+	const [isShowModal, setShowModal] = useState(false);
 	const [todoItemForEditing, setTodoItemForEditing] = useState({});
-	const [todos, setTodos] = useState([]);
 
-	const fetchTodos = useCallback(async () => {
-		try {
-			setLoading(true);
-			const todos = await request.getTodos();
-			setTodos(todos);
-		} catch (e) {
-			console.error(e);
-		} finally {
-			setLoading(false);
-		}
-	}, []);
+	let {
+		isLoading,
+		result: todos,
+		handleResponse: loadTodos,
+	} = useRequest(getTodos);
 
 	useEffect(() => {
-		fetchTodos().then(() => {});
+		loadTodos().catch((e) => {
+			console.log(e, 'Failure load todos');
+		});
 	}, []);
 
 	useEffect(() => {
@@ -46,94 +48,75 @@ export default function TodoList() {
 		}
 	}, [isShowModal]);
 
-	async function deleteTodoItem() {
-		try {
-			const filteredTodos = todos.filter((todo) => !todo.isChecked);
-			const todosIds = filteredTodos.map((todo) => todo.id).flat();
-			setLoading(true);
-			await request.deleteTodos({ todosIds });
-			setTodos(filteredTodos);
-		} catch (e) {
-			console.error(e);
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	async function addTodo(newTodoItem) {
-		try {
-			setShowingModal(false);
-			setLoading(true);
-			const { data } = await request.createTodo(newTodoItem);
-			setTodos(todos.concat([data]));
-		} catch (e) {
-			console.error(e);
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	async function updateTodo(todoItem) {
-		try {
-			setShowingModal(false);
-			setLoading(true);
-			const { data } = await request.updateTodo(todoItem.id, todoItem);
-
-			setTodos(
-				todos.map((todo) => {
-					if (todo.id === data.id) {
-						todo = data;
-					}
-					todo.isChecked = false;
-
-					return todo;
-				}),
-			);
-		} catch (e) {
-			console.error(e);
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	function showModalForEditing(todoItem) {
-		setTodoItemForEditing(todoItem);
+	function showModalForEditing(todo) {
+		setTodoItemForEditing(todo);
 		setTheModalData(updatingModalData);
-		setShowingModal(true);
+		setShowModal(true);
 	}
 
-	function closeModal() {
-		setTodos(
-			todos.map((todo) => {
-				todo.isChecked = false;
-				return todo;
-			}),
-		);
-		setShowingModal(false);
+	async function onDelete(id) {
+		try {
+			await deleteTodo(id);
+			await loadTodos();
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	async function toggleComplete(todo) {
+		try {
+			await completeTodo(todo.id, {
+				completed: todo.completed,
+			});
+			todos = await getTodos();
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	async function modalFormHandler(todo) {
+		setShowModal(false);
+
+		if (todo.id) {
+			try {
+				await updateTodo(todo.id, todo);
+				await loadTodos();
+			} catch (e) {
+				console.error(e);
+			}
+		} else {
+			try {
+				await createTodo(todo);
+				await loadTodos();
+			} catch (e) {
+				console.error(e);
+			}
+		}
 	}
 
 	return (
 		<>
 			{isLoading && <Loader className="text-center" />}
 
-			{!todos.length && !isLoading && (
+			{!todos?.length && !isLoading && (
 				<div className="p-3 text-center text-2xl">No Todos...</div>
 			)}
 
-			{todos.length && !isLoading && (
-				<div className="flex max-h-96 flex-col gap-2 overflow-y-auto">
+			{todos?.length && !isLoading && (
+				<div className="flex max-h-96 flex-col gap-2 overflow-y-auto rounded-xl p-4 shadow">
 					{todos.map((todo) => (
 						<TodoItem
 							key={todo.id}
 							todo={todo}
-							onEdit={() => {}}
-							onDelete={() => {}}
+							toggleComplete={toggleComplete}
+							onEdit={showModalForEditing}
+							onDelete={onDelete}
 						/>
 					))}
 				</div>
 			)}
 
-			<AddButton onClick={() => setShowingModal(true)} />
+			<AddButton onClick={() => setShowModal(true)} />
 
 			{isShowModal && (
 				<ModalTodoForm
@@ -141,8 +124,8 @@ export default function TodoList() {
 					todoItemForEditing={todoItemForEditing}
 					formTitle={theModalData.title}
 					submitButtonText={theModalData.button}
-					onSubmit={theModalData.isUpdating ? updateTodo : addTodo}
-					onClose={closeModal}
+					onSubmit={modalFormHandler}
+					onClose={() => setShowModal(false)}
 				/>
 			)}
 		</>

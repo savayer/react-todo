@@ -29,10 +29,17 @@ export const updateTodo = (id, data) => {
 	});
 };
 
-export const deleteTodos = (data) => {
+export const completeTodo = (id, data) => {
 	return makeRequest({
-		url: '/api/todos/1',
-		method: 'DELETE',
+		url: `/api/todos/${id}`,
+		method: 'PATCH',
 		data,
+	});
+};
+
+export const deleteTodo = (id) => {
+	return makeRequest({
+		url: `/api/todos/${id}`,
+		method: 'DELETE',
 	});
 };

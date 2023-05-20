@@ -5,11 +5,15 @@ import Button from './UI/Button';
 import Trash from '../icons/Trash';
 import Editing from '../icons/Editing';
 
-export default function TodoItem({ todo, onEdit, onDelete }) {
+export default function TodoItem({ todo, toggleComplete, onEdit, onDelete }) {
 	const [isChecked, setChecked] = useState(todo.completed);
 
 	function onChange() {
 		setChecked(!isChecked);
+		toggleComplete({
+			id: todo.id,
+			completed: !isChecked,
+		});
 	}
 
 	return (
@@ -38,9 +42,9 @@ export default function TodoItem({ todo, onEdit, onDelete }) {
 			</Checkbox>
 
 			<Button
-				title="Delete task"
+				title="Edit task"
 				className="ml-auto mr-1 bg-blue-400 !p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
-				onClick={onEdit}
+				onClick={() => onEdit(todo)}
 			>
 				<Editing className="h-4 w-4 fill-white" />
 			</Button>
@@ -48,7 +52,7 @@ export default function TodoItem({ todo, onEdit, onDelete }) {
 			<Button
 				title="Delete task"
 				className="bg-red-400 !p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
-				onClick={onDelete}
+				onClick={() => onDelete(todo.id)}
 			>
 				<Trash className="h-4 w-4 fill-white" />
 			</Button>
