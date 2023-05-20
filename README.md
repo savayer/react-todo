@@ -7,7 +7,9 @@ The server [up here](https://todoserver.savayer.space/api/todos)
 ## Installation
 Clone the repo and install the dependencies:
 
-`npm i`
+```
+npm i
+```
 
 Then install the dependencies for the server:
 
