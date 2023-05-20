@@ -3,7 +3,7 @@ import Todo from "../models/Todo.js";
 
 const router = Router();
 
-router.get("/todos", async (req, res, next) => {
+router.get("/todos", async (req, res) => {
   try {
     res.json(await Todo.find({})).status(200);
   } catch (e) {

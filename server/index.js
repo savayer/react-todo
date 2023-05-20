@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 5050;
 
 /*app.use('/', (req, res) => {
-  res.sendFile('client/build/index.html', {root: '../'})
+  res.sendFile('client/build/index.html', {root: '.'})
 })*/
 app.use(cors())
 app.use(bodyParser.json());
